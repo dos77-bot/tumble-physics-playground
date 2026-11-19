@@ -221,6 +221,10 @@ html, body {
   padding-bottom: calc(12px + var(--safe-b));
 }
 
+.help-overlay[hidden] {
+  display: none !important;
+}
+
 .help-card {
   width: min(480px, 100%);
   max-height: min(88dvh, 720px);
