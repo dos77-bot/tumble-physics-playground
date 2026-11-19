@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#12110e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="Tumble — a 3D physics playground. Grab, throw, knock over towers, dominos, and wrecking balls." />
+  <meta property="og:title" content="Tumble — 3D Physics Playground" />
+  <meta property="og:description" content="Grab, throw, and smash in a warm workshop yard. Towers, dominos, bowling, cradle, wrecking ball." />
+  <meta property="og:type" content="website" />
+  <title>Tumble — 3D Physics Playground</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="c"></canvas>
+
+    <header class="top-bar">
+      <div class="brand">
+        <span class="logo">Tumble</span>
+        <span class="scene-label" id="sceneLabel">Warm-up</span>
+      </div>
+      <div class="top-actions">
+        <button type="button" class="icon-btn" id="btnHelp" aria-label="How to use" title="How to use">?</button>
+        <button type="button" class="icon-btn" id="btnMute" aria-label="Mute" title="Mute">🔊</button>
+        <button type="button" class="icon-btn" id="btnPause" aria-label="Pause" title="Pause">⏸</button>
+      </div>
+    </header>
+
+    <p class="hint" id="hint">Drag pieces to grab & throw · Drag empty floor to look · Pinch to zoom</p>
+
+    <div class="notice" id="notice" hidden></div>
+
+    <aside class="dock" id="dock">
+      <div class="row materials" id="materials">
+        <button type="button" class="chip active" data-mat="wood">Wood</button>
+        <button type="button" class="chip" data-mat="rubber">Rubber</button>
+        <button type="button" class="chip" data-mat="metal">Metal</button>
+        <button type="button" class="chip" data-mat="ice">Ice</button>
+      </div>
+      <div class="row shapes" id="shapes">
+        <button type="button" class="shape-btn active" data-shape="box" aria-label="Cube">▣ Cube</button>
+        <button type="button" class="shape-btn" data-shape="sphere" aria-label="Sphere">● Sphere</button>
+        <button type="button" class="shape-btn" data-shape="cylinder" aria-label="Cylinder">⌀ Cyl</button>
+        <button type="button" class="shape-btn" data-shape="plank" aria-label="Plank">▬ Plank</button>
+        <button type="button" class="shape-btn primary" id="btnSpawn">Drop</button>
+      </div>
+      <div class="row scenes" id="scenes">
+        <button type="button" class="scene-chip active" data-scene="warm">Warm-up</button>
+        <button type="button" class="scene-chip" data-scene="tower">Tower</button>
+        <button type="button" class="scene-chip" data-scene="dominos">Dominos</button>
+        <button type="button" class="scene-chip" data-scene="bowl">Bowling</button>
+        <button type="button" class="scene-chip" data-scene="pyramid">Pyramid</button>
+        <button type="button" class="scene-chip" data-scene="cradle">Cradle</button>
+        <button type="button" class="scene-chip" data-scene="wreck">Wrecking</button>
+        <button type="button" class="scene-chip" data-scene="ramps">Ramps</button>
+      </div>
+      <div class="row world">
+        <label class="slider-label">Gravity
+          <input type="range" id="gravity" min="1.6" max="24" step="0.1" value="9.81" />
+          <span id="gVal">1.0g</span>
+        </label>
+        <button type="button" class="chip" id="btnSlow">Slow-mo</button>
+        <button type="button" class="chip" id="btnClear">Clear</button>
+        <button type="button" class="chip" id="btnReload">Reset</button>
+      </div>
+      <p class="count" id="count">0 pieces</p>
+    </aside>
+
+    <div class="help-overlay" id="help" hidden>
+      <div class="help-card" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+        <div class="help-head">
+          <h1 id="helpTitle">How to use Tumble</h1>
+          <button type="button" class="icon-btn" id="btnCloseHelp" aria-label="Close">✕</button>
+        </div>
+        <div class="help-body">
+          <p class="lead">Tumble is a tabletop physics yard. Drop things, knock them over, and feel the weight of every bounce.</p>
+
+          <section>
+            <h2>Look around</h2>
+            <p>Drag an empty patch of the floor to orbit the camera. Pinch (or scroll) to zoom. You are looking at the yard, not walking inside it.</p>
+          </section>
+
+          <section>
+            <h2>Grab & throw</h2>
+            <p>Press any loose object and drag — it follows your finger. Let go and it keeps the speed of your hand. A quick flick throws; a slow release just sets it down.</p>
+          </section>
+
+          <section>
+            <h2>Spawn pieces</h2>
+            <p>Pick a material, then a shape, then hit <strong>Drop</strong>. New pieces fall into the middle of the yard.</p>
+            <ul>
+              <li><strong>Wood</strong> — light everyday weight, sticks a little</li>
+              <li><strong>Rubber</strong> — light and bouncy</li>
+              <li><strong>Metal</strong> — heavy, hits hard</li>
+              <li><strong>Ice</strong> — almost no grip, slides forever</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Ready-made scenes</h2>
+            <p>Warm-up, Tower, Dominos, Bowling, Pyramid, Newton's Cradle, Wrecking ball, and Ramps. Loading a scene replaces what is on the floor.</p>
+          </section>
+
+          <section>
+            <h2>The world</h2>
+            <p>Gravity runs from a soft moon pull (~0.16g) to a hard crush (~2.4g). Slow-mo stretches every bounce. Pause freezes the yard. Clear sweeps pieces but keeps the floor. Reset reloads the current scene.</p>
+          </section>
+
+          <section>
+            <h2>Things that feel good</h2>
+            <ul>
+              <li>Stack the tower, then tap it with a metal sphere</li>
+              <li>Line up dominos and roll the ball from the end</li>
+              <li>Pull the first cradle ball back and let it click through</li>
+              <li>Stand aside and let the wrecking ball swing into the wall</li>
+            </ul>
+          </section>
+
+          <p class="foot">Works offline once loaded. On Android: open in Chrome → menu → "Add to Home screen" for a full-screen app.</p>
+        </div>
+        <button type="button" class="btn-got-it" id="btnGotIt">Got it — let's play</button>
+      </div>
+    </div>
+
+    <div class="boot" id="boot">
+      <p class="boot-title">Tumble</p>
+      <p class="boot-sub">Physics yard</p>
+      <p class="boot-hint">Loading the workshop…</p>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+      "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"
+    }
+  }
+  </script>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
